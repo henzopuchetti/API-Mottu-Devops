@@ -5,10 +5,14 @@ WORKDIR /app
 COPY . .
 RUN mvn clean package -DskipTests
 
-# Etapa 2: execução da aplicação com Java 17
-FROM eclipse-temurin:17-jdk
+# Etapa 2: execução com Java 17 leve e seguro
+FROM eclipse-temurin:17-jdk-alpine
 
-WORKDIR /app
+# Criar usuário não root
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+USER appuser
+
+WORKDIR /home/appuser/app
 COPY --from=builder /app/target/safeyard-*.jar app.jar
 
 EXPOSE 8080
